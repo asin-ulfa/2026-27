@@ -155,6 +155,9 @@ const ICON={
 };
 
 const PHASES=[
+ {id:"students",out:0,c:"student",status:"group",dates:"2026/27",title:"Students",sl:"Študenti",icon:"talk",
+  why:"The band is all of you. Each card shows one student and their work so far: the workshop they attended and the workshop type they taught.",whySl:"Tok ste vi. Vsaka kartica je en študent in njegovo dosedanje delo: delavnica, ki se je je udeležil, in tip delavnice, ki ga je predstavil.",
+  kpis:[{v:N,l:"students",ls:"študentov"}],up:[],down:"st"},
  {id:"basics",out:0,c:"black",w:620,status:"done",dates:"1.–15. 10.",title:"Workshop basics",sl:"Osnove delavnic",icon:"intro",
   why:"What action planning is, which workshop types exist and how a workshop works as a mechanism.",whySl:"Kaj je akcijsko načrtovanje, kateri tipi delavnic obstajajo in kako delavnica deluje kot mehanizem.",
   kpis:[{v:N,l:"students",ls:"študentov"}],
@@ -213,6 +216,7 @@ function chip(label,key,isVideo,title,labelSl){label=tr(label,labelSl);const has
 function thumbImg(key,title){const t=THUMB[key];return t?`<img class="thumb" src="${t}" alt="" loading="lazy" data-key="${key}" data-title="${esc(title)}">`:""}
 // items below the band for a theme
 function outItems(p){
+  if(p.down==="st")return Object.keys(STUDENTS).map(w=>{const n=STUDENTS[w],pk=PK.find(x=>x.who===w),tk=TOOLKIT.find(t=>t.who===w);let m="";if(pk)m+=chip("PechaKucha","pk_"+w,false,"PechaKucha · "+n,"PechaKucha");if(tk&&tk.video)m+=chip("Video","tv_"+w,true,tr(tk.type,tk.sl)+" · "+n,"Video");if(tk&&tk.pres)m+=chip("Toolkit","tk_"+w,false,tr(tk.type,tk.sl)+" · "+n,"Toolkit");return{u:1,c:p.c,html:`${thumbImg(pk?"pk_"+w:(tk&&tk.video?"tv_"+w:"tk_"+w),n)}<h4>${esc(n)}</h4>${pk?`<div class="sl">${esc(tr(pk.h||"Workshop I attended",pk.hs||"Obiskana delavnica"))}</div>`:""}${tk?`<div class="who">${esc(tr(tk.type,tk.sl))}</div>`:""}<div class="meta">${m}</div>`}});
   if(p.down==="pk")return PK.map(x=>{const n=STUDENTS[x.who],k="pk_"+x.who;return{u:1,c:p.c,html:`${thumbImg(k,"PechaKucha · "+n)}<h4>${esc(tr(x.h||"Workshop I attended",x.hs||"Delavnica, ki sem se je udeležil"))}</h4><div class="who">${esc(n)}</div><div class="meta">${chip("Slides",k,false,"PechaKucha · "+n,"Prosojnice")}</div>`}});
   if(p.down==="tk")return TOOLKIT.map(t=>{const n=STUDENTS[t.who];let m="";if(t.video)m+=chip("Video","tv_"+t.who,true,tr(t.type,t.sl)+" · "+n,"Video");if(t.pres)m+=chip("Presentation","tk_"+t.who,false,tr(t.type,t.sl)+" · "+n,"Predstavitev");return{u:(t.pres?1:0)+(t.video?1:0),c:p.c,html:`${thumbImg("tv_"+t.who,t.type)||thumbImg("tk_"+t.who,t.type)}<h4>${esc(tr(t.type,t.sl))}</h4><div class="sl">${esc(tr(t.sl,t.type))}</div><div class="who">${esc(n)}</div><div class="meta">${m}</div>`}});
   return p.down.map(o=>({u:o.u||1,c:p.c,planned:o.planned,html:`${o.ph?`<span class="ph">${tr("Placeholder · TNP slide","Začasni primer · prosojnica TNP")}</span>`:""}${o.img?`<img class="thumb" src="${T(o.img[0])}" alt="" data-key="tnp_slides" data-idx="${o.img[1]}" data-title="TNP slides">`:""}<h4>${esc(tr(o.h,o.sl))}</h4>${o.sl?`<div class="sl">${esc(tr(o.sl,o.h))}</div>`:""}${o.dt?`<div class="dt">${esc(o.dt)}</div>`:""}`}));
@@ -235,8 +239,8 @@ function ribbon(x0,y0,x1,y1,w0,w1,fill,op,cls,data){
   return `<path${cls?` class="${cls}"`:""}${data||""} d="M${x0-w0/2} ${y0} C ${x0-w0/2} ${my}, ${x1-w1/2} ${my}, ${x1-w1/2} ${y1} L ${x1+w1/2} ${y1} C ${x1+w1/2} ${my}, ${x0+w0/2} ${my}, ${x0+w0/2} ${y0} Z" fill="${fill}" fill-opacity="${op}"/>`;
 }
 function headHtml(cl,i,open,Wo,Wc){
-  const p=cl.p,st=LANG==="sl"?{done:"zaključeno",now:"v teku",planned:"načrtovano"}[p.status]:{done:"done",now:"in progress",planned:"planned"}[p.status];
-  return `<button type="button" class="head ${p.status}" data-open="${p.id}" aria-pressed="${open}" style="left:${cl.x+12}px;width:${open?Wo-30:cl.w-18}px"><span class="num">${String(i+1).padStart(2,"0")} · ${esc(p.dates)}${open?`<span class="st">${st}</span>`:""}</span><h2 style="font-size:${open?22:14}px">${esc(open?tr(p.title,p.sl):tr(p.title,p.sl).split(":")[0])}${open?"":`<span class="more" aria-hidden="true">›</span>`}</h2>${open?"":`<span class="peek"><div>${esc(tr(p.why,p.whySl))}<br><span class="go">${tr("Click to open ›","Klikni za odprtje ›")}</span></div></span>`}${open?`<div style="font-family:var(--body);font-size:13px;color:var(--muted);font-style:italic">${esc(tr(p.sl,p.title))}</div><p style="font-family:var(--body);font-size:13px;margin:6px 0 0;max-width:62ch;white-space:normal">${esc(tr(p.why,p.whySl))}</p><div class="kpis" style="margin:10px 0 0;justify-content:flex-start">${p.kpis.map(kpiHtml).join("")}</div>`:""}</button>`;
+  const p=cl.p,st=LANG==="sl"?{done:"zaključeno",now:"v teku",planned:"načrtovano",group:"8 študentov"}[p.status]:{done:"done",now:"in progress",planned:"planned",group:"8 students"}[p.status];
+  return `<button type="button" class="head ${p.status}" data-open="${p.id}" aria-pressed="${open}" style="left:${cl.x+12}px;width:${open?Wo-30:cl.w-18}px"><span class="num">${(p.id==="students"?tr("Group","Skupina"):String(i).padStart(2,"0"))} · ${esc(p.dates)}${open?`<span class="st">${st}</span>`:""}</span><h2 style="font-size:${open?22:14}px">${esc(open?tr(p.title,p.sl):tr(p.title,p.sl).split(":")[0])}${open?"":`<span class="more" aria-hidden="true">›</span>`}</h2>${open?"":`<span class="peek"><div>${esc(tr(p.why,p.whySl))}<br><span class="go">${tr("Click to open ›","Klikni za odprtje ›")}</span></div></span>`}${open?`<div style="font-family:var(--body);font-size:13px;color:var(--muted);font-style:italic">${esc(tr(p.sl,p.title))}</div><p style="font-family:var(--body);font-size:13px;margin:6px 0 0;max-width:62ch;white-space:normal">${esc(tr(p.why,p.whySl))}</p><div class="kpis" style="margin:10px 0 0;justify-content:flex-start">${p.kpis.map(kpiHtml).join("")}</div>`:""}</button>`;
 }
 const KA=0.5523;
 // one strand: rises from below in a vertical stem, turns with rounded corners and continues right in the band
@@ -262,13 +266,13 @@ function draw(){
   ["cyan","magenta","yellow","black","student"].forEach(c=>{defs+=`<pattern id="h-${c}" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="7" height="7" fill="${col(c)}" fill-opacity=".18"/><rect width="2.6" height="7" fill="${col(c)}" fill-opacity=".75"/></pattern>`});
   // layers of the band
   const layers=[{c:"student",w:N*U,x0:20,label:`${N} students`}];
-  cols.forEach(cl=>{if(cl.p.out)layers.push({c:cl.p.c,w:cl.p.out*U,x0:cl.nx,planned:cl.p.status!=="done",id:cl.p.id})});
+  cols.forEach(cl=>{if(cl.p.out&&cl.p.id!=="students")layers.push({c:cl.p.c,w:cl.p.out*U,x0:cl.nx,planned:cl.p.status!=="done",id:cl.p.id})});
   let off=BT;layers.forEach(L=>{L.y=off;off+=L.w});
   const bandBottomAt=xx=>layers.filter(L=>L.x0<=xx).reduce((a,L)=>Math.max(a,L.y+L.w),BT);
   // draw layers
   layers.filter(L=>!L.id).forEach(L=>{
     const fill=L.planned?`url(#h-${L.c})`:col(L.c);
-    svg+=`<path class="hit"${L.id?` data-open="${L.id}"`:""} d="M${L.x0} ${L.y} L ${endX} ${L.y} L ${endX} ${L.y+L.w} L ${L.x0} ${L.y+L.w} Z" fill="${fill}" fill-opacity="${L.planned?1:.92}"/>`;
+    svg+=`<path class="hit" data-open="${L.id||"students"}" d="M${L.x0} ${L.y} L ${endX} ${L.y} L ${endX} ${L.y+L.w} L ${L.x0} ${L.y+L.w} Z" fill="${fill}" fill-opacity="${L.planned?1:.92}"/>`;
   });
   html+=`<div class="lbl" style="left:20px;top:${BT-26}px;font-size:14px;font-weight:600">${N}</div><div class="lbl on-band" style="left:28px;top:${BT+4}px;font-size:13px">${tr("students","študentov")}</div>`;
   html+=`<div class="lbl" style="left:${endX+8}px;top:${BT-4}px;font-size:13px;color:var(--muted)">${layers.reduce((a,L)=>a+(L.c==="student"?0:L.w/U),0)} ${tr("results<br>planned and done","rezultatov,<br>načrtovanih in opravljenih")}</div>`;
@@ -279,6 +283,22 @@ function draw(){
     // separator
     svg+=`<line x1="${cl.x}" y1="0" x2="${cl.x}" y2="2000" stroke="${col("line")}" stroke-width="1"/>`;
     html+=headHtml(cl,i,open,Wo,Wc);
+    if(p.id==="students"){
+      const outs=outItems(p),sb=layers[0];
+      if(open){
+        const per=Math.max(1,Math.floor((Wo-40)/232));const cw=Math.min(220,(Wo-40)/per-12);
+        const top=bandBottomAt(endX)+70;
+        outs.forEach((it,j)=>{const r=Math.floor(j/per),k=j%per;const pk="students:o"+j,po=posOf(pk);const cx=cl.x+20+k*(cw+12)+po.dx,cy=top+r*250+po.dy;
+          html+=`<div class="card drag" data-pk="${pk}" style="position:absolute;left:${cx}px;top:${cy}px;width:${cw}px;--c:${col(c)}">${it.html}</div>`;
+          if(r===0)svg+=ribbon(cl.nx+6+j*4,sb.y+sb.w-2,cx+cw/2,cy,3,6,col(c),.55);else svg+=ribbon(cl.nx+6+j*4,sb.y+sb.w-2,cx-6,cy+20,3,3,col(c),.35);});
+        cl.h=top+Math.ceil(outs.length/per)*250;
+      }else{
+        const ty=bandBottomAt(endX)+70;
+        svg+=ribbon(cl.nx+8,sb.y+sb.w-2,cl.nx+8,ty,8,8,col(c),.5,"hit",` data-open="students"`);
+        html+=`<button type="button" class="term" data-open="students" style="left:${cl.nx}px;top:${ty+6}px"><span class="n">${N}</span><span class="t" style="max-width:${cl.w-34}px">${tr("students and their work","študentov in njihovo delo")}</span></button>`;
+      }
+      return;
+    }
     // meetings inflow
     const ins=inItems(p);
     if(ins.length){
