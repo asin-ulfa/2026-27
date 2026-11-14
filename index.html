@@ -61,6 +61,7 @@ button{font:inherit;color:inherit}
 .head.peeking{width:300px!important;z-index:6;background:var(--panel);padding:8px 12px 10px;margin:-8px 0 0 -12px;border-radius:8px;box-shadow:0 8px 28px rgba(0,0,0,.16)}
 .head.peeking .peek{grid-template-rows:1fr;opacity:1}
 .head.peeking .more{display:none}
+.ph{display:inline-block;margin:0 0 6px;padding:1px 7px;border:1px dashed var(--muted);border-radius:999px;font-family:var(--mono);font-size:10.5px;letter-spacing:.03em;text-transform:uppercase;color:var(--muted)}
 .colhit{cursor:pointer}.colhit.peeking{fill:var(--ink);fill-opacity:.045}
 .head{position:absolute;top:10px;width:230px;background:none;border:0;padding:0;text-align:left;cursor:pointer}
 .head .num{font-family:var(--mono);font-size:11px;color:var(--muted)}
@@ -166,7 +167,7 @@ const PHASES=[
   why:"Triglav National Park showed how it manages visitors at natural sites. The Savica Waterfall is the main case.",whySl:"Triglavski narodni park je predstavil, kako upravlja obisk naravnih vrednot. Glavni primer je slap Savica.",
   kpis:[{v:78,u:"min",l:"lecture, EN subtitles",ls:"predavanje, angleški podnapisi"},{v:113,l:"slides translated",ls:"prevedenih prosojnic"},{v:"1,500",vs:"1.500",l:"visitors/day, Savica capacity",ls:"obiskovalcev na dan, zmogljivost Savice"},{v:"350k",vs:"350.000",l:"Vintgar visitors, 2025",ls:"obiskovalcev Vintgarja, 2025"}],
   up:[{feature:true,h:"Visitor management at natural sites",sl:"Aleš Zdešar, JZ TNP",dt:"12. 11.",media:[["Lecture, EN subtitles","tnp_video",true,"Predavanje, angleški podnapisi"],["Slides, EN","tnp_slides",false,"Prosojnice, EN"]],strip:true}],
-  down:[{h:"Savica Waterfall",sl:"Slap Savica · main case",img:[56,55]},{h:"Lepena Valley",sl:"Dolina Lepene",img:[84,83]},{h:"Canyoning",sl:"Soteskanje",img:[96,95]},{h:"Your questions to TNP",sl:"Vaša vprašanja",dt:"12. 11."}]},
+  down:[{ph:1,h:"Savica Waterfall",sl:"Slap Savica · main case",img:[56,55]},{ph:1,h:"Lepena Valley",sl:"Dolina Lepene",img:[84,83]},{ph:1,h:"Canyoning",sl:"Soteskanje",img:[96,95]},{h:"Your questions to TNP",sl:"Vaša vprašanja",dt:"12. 11."}]},
  {id:"plan",out:18,c:"cyan",status:"now",dates:"12.–26. 11.",title:"Problem and workshop plan",sl:"Problem in načrt delavnice",icon:"problem",
   why:"Pick one problem from the TNP discussion and design a workshop for it with one type from the toolkit. On 26 Nov we vote on the plan we run.",whySl:"Izberi en problem iz pogovora s TNP in zanj zasnuj delavnico z enim tipom iz nabora orodij. 26. 11. glasujemo, katero izvedemo.",
   kpis:[{v:0,of:N,l:"problems defined, 19. 11.",ls:"opredeljenih problemov, 19. 11."},{v:0,of:N,l:"plans as PDF, 26. 11.",ls:"načrtov v PDF, 26. 11."}],
@@ -206,7 +207,7 @@ function thumbImg(key,title){const t=THUMB[key];return t?`<img class="thumb" src
 function outItems(p){
   if(p.down==="pk")return PK.map(x=>{const n=STUDENTS[x.who],k="pk_"+x.who;return{u:1,c:p.c,html:`${thumbImg(k,"PechaKucha · "+n)}<h4>${esc(tr(x.h||"Workshop I attended",x.hs||"Delavnica, ki sem se je udeležil"))}</h4><div class="who">${esc(n)}</div><div class="meta">${chip("Slides",k,false,"PechaKucha · "+n,"Prosojnice")}</div>`}});
   if(p.down==="tk")return TOOLKIT.map(t=>{const n=STUDENTS[t.who];let m="";if(t.video)m+=chip("Video","tv_"+t.who,true,tr(t.type,t.sl)+" · "+n,"Video");if(t.pres)m+=chip("Presentation","tk_"+t.who,false,tr(t.type,t.sl)+" · "+n,"Predstavitev");return{u:(t.pres?1:0)+(t.video?1:0),c:p.c,html:`${thumbImg("tv_"+t.who,t.type)||thumbImg("tk_"+t.who,t.type)}<h4>${esc(tr(t.type,t.sl))}</h4><div class="sl">${esc(tr(t.sl,t.type))}</div><div class="who">${esc(n)}</div><div class="meta">${m}</div>`}});
-  return p.down.map(o=>({u:o.u||1,c:p.c,planned:o.planned,html:`${o.img?`<img class="thumb" src="${T(o.img[0])}" alt="" data-key="tnp_slides" data-idx="${o.img[1]}" data-title="TNP slides">`:""}<h4>${esc(tr(o.h,o.sl))}</h4>${o.sl?`<div class="sl">${esc(tr(o.sl,o.h))}</div>`:""}${o.dt?`<div class="dt">${esc(o.dt)}</div>`:""}`}));
+  return p.down.map(o=>({u:o.u||1,c:p.c,planned:o.planned,html:`${o.ph?`<span class="ph">${tr("Placeholder · TNP slide","Začasni primer · prosojnica TNP")}</span>`:""}${o.img?`<img class="thumb" src="${T(o.img[0])}" alt="" data-key="tnp_slides" data-idx="${o.img[1]}" data-title="TNP slides">`:""}<h4>${esc(tr(o.h,o.sl))}</h4>${o.sl?`<div class="sl">${esc(tr(o.sl,o.h))}</div>`:""}${o.dt?`<div class="dt">${esc(o.dt)}</div>`:""}`}));
 }
 function inItems(p){
   return p.up.map(o=>({planned:o.planned,html:`${o.key?thumbImg(o.key,tr(o.h,o.sl)):""}<h4>${esc(tr(o.h,o.sl))}</h4>${o.sl?`<div class="sl">${esc(tr(o.sl,o.h))}</div>`:""}${o.dt?`<div class="dt">${esc(o.dt)}</div>`:""}${o.media?`<div class="meta">${o.media.map(m=>chip(m[0],m[1],m[2],o.h,m[3])).join("")}</div>`:""}${o.strip?`<div class="strip">${[0,1,2,3,4,5,6,7].map(i=>`<img src="${M}thumbs/tnp_part0${i}.jpg" alt="Part ${i+1}" loading="lazy" data-key="tnp_video" data-idx="${i}" data-title="${esc(o.h)}">`).join("")}</div>`:""}`}));
