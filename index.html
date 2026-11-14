@@ -350,8 +350,8 @@ stage.addEventListener("pointermove",e=>{if(!drag)return;const mx=e.clientX-drag
 stage.addEventListener("pointerup",()=>{if(!drag)return;const d=drag;drag=null;if(dragMoved){POS[d.k]={dx:d.dx+d.mx,dy:d.dy+d.my};savePos();draw()}});
 stage.addEventListener("click",e=>{if(dragMoved){e.stopPropagation();e.preventDefault();dragMoved=false}},true);
 function markPeek(){stage.querySelectorAll(".peeking").forEach(e=>e.classList.remove("peeking"));if(peekId&&peekId!==openId)stage.querySelectorAll(`.head[data-open="${peekId}"],.colhit[data-open="${peekId}"]`).forEach(e=>e.classList.add("peeking"))}
-function peekStep(){const d=peekT-peekX;peekX=Math.abs(d)<2?peekT:peekX+d*0.35;draw();if(peekX===0&&peekT===0)peekId=null;markPeek();peekRaf=peekX!==peekT?requestAnimationFrame(peekStep):0}
-function peek(id){if(drag)return;if(id===openId)id=null;if(id&&id===peekId){if(peekT!==PEEK){peekT=PEEK;if(!peekRaf)peekRaf=requestAnimationFrame(peekStep)}return}
+function peekStep(){const d=peekT-peekX,prev=peekX;peekX=Math.abs(d)<2?peekT:peekX+d*0.35;if(Math.round(prev)!==Math.round(peekX)||peekX===peekT)draw();if(peekX===0&&peekT===0)peekId=null;markPeek();peekRaf=peekX!==peekT?requestAnimationFrame(peekStep):0}
+function peek(id){if(drag)return;if(id===openId)id=null;if(!id&&(!peekId||peekT===0))return;if(id&&id===peekId){if(peekT!==PEEK){peekT=PEEK;if(!peekRaf)peekRaf=requestAnimationFrame(peekStep)}return}
   if(id){if(peekId&&peekId!==id){peekX=0}peekId=id;peekT=PEEK}else{peekT=0}
   markPeek();if(!peekRaf)peekRaf=requestAnimationFrame(peekStep)}
 stage.addEventListener("pointerover",e=>{if(e.pointerType==="touch")return;const o=e.target.closest("[data-open]");peek(o?o.dataset.open:null)});
