@@ -68,9 +68,10 @@ button{font:inherit;color:inherit}
 .qt:hover img{outline:2px solid var(--yellow);outline-offset:1px}
 .card.drag{cursor:grab;touch-action:none}.card.dragging{cursor:grabbing;z-index:20;box-shadow:0 10px 30px rgba(0,0,0,.18);opacity:.95}
 .rst{border:1px solid var(--line);border-radius:999px;background:transparent;padding:3px 12px;font-family:var(--mono);font-size:12px;color:var(--muted);cursor:pointer;align-self:center}.rst:hover{color:var(--ink)}
-.mini{position:fixed;left:12px;bottom:12px;z-index:30;background:var(--paper);border:1px solid var(--line);border-radius:6px;box-shadow:0 4px 18px rgba(0,0,0,.12);padding:4px;cursor:pointer;line-height:0}
+.mini{position:fixed;left:12px;bottom:12px;z-index:30;background:color-mix(in srgb,var(--paper) 70%,transparent);border:1px solid var(--line);border-radius:6px;padding:4px;cursor:pointer;line-height:0;filter:grayscale(1);opacity:.45;transition:opacity .2s}
+.mini:hover{opacity:.9}
 .mini svg{display:block}
-.mini .vp{fill:var(--cyan);fill-opacity:.12;stroke:var(--cyan);stroke-width:2;vector-effect:non-scaling-stroke}
+.mini .vp{fill:var(--ink);fill-opacity:.08;stroke:var(--ink);stroke-width:2;vector-effect:non-scaling-stroke}
 @media (max-width:600px){.mini{display:none}}
 .colhit{cursor:pointer}.colhit.peeking{fill:var(--ink);fill-opacity:.045}
 .head{position:absolute;top:10px;width:230px;background:none;border:0;padding:0;text-align:left;cursor:pointer}
