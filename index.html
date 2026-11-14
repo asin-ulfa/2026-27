@@ -62,6 +62,12 @@ button{font:inherit;color:inherit}
 .head.peeking .peek{grid-template-rows:1fr;opacity:1}
 .head.peeking .more{display:none}
 .ph{display:inline-block;margin:0 0 6px;padding:1px 7px;border:1px dashed var(--muted);border-radius:999px;font-family:var(--mono);font-size:10.5px;letter-spacing:.03em;text-transform:uppercase;color:var(--muted)}
+.quad{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.qt{display:grid;gap:4px;padding:0;border:0;background:none;text-align:left;cursor:pointer;font-size:11.5px;line-height:1.25;color:var(--ink)}
+.qt img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:4px;border:1px solid var(--line)}
+.qt:hover img{outline:2px solid var(--yellow);outline-offset:1px}
+.card.drag{cursor:grab;touch-action:none}.card.dragging{cursor:grabbing;z-index:20;box-shadow:0 10px 30px rgba(0,0,0,.18);opacity:.95}
+.rst{border:1px solid var(--line);border-radius:999px;background:transparent;padding:3px 12px;font-family:var(--mono);font-size:12px;color:var(--muted);cursor:pointer;align-self:center}.rst:hover{color:var(--ink)}
 .colhit{cursor:pointer}.colhit.peeking{fill:var(--ink);fill-opacity:.045}
 .head{position:absolute;top:10px;width:230px;background:none;border:0;padding:0;text-align:left;cursor:pointer}
 .head .num{font-family:var(--mono);font-size:11px;color:var(--muted)}
@@ -116,7 +122,7 @@ button{font:inherit;color:inherit}
   <a class="ulfa" href="https://www.fa.uni-lj.si/" target="_blank" rel="noopener"><img class="logo-b" id="logoB" alt="Univerza v Ljubljani, Fakulteta za arhitekturo"><img class="logo-w" id="logoW" alt="Univerza v Ljubljani, Fakulteta za arhitekturo"></a>
   <div class="ttl"><h1>ASIN 2026/27 <span id="cname">· Akcijsko in strateško načrtovanje</span></h1><div class="facts" id="facts"></div></div>
   <p id="intro"></p>
-  <div class="tgl"><div class="lang" role="group" aria-label="Background / ozadje"><button type="button" data-theme="light" aria-label="Light / svetlo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button><button type="button" data-theme="dark" aria-label="Dark / temno"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg></button></div><div class="lang" role="group" aria-label="Language / jezik"><button type="button" data-lang="sl">SL</button><button type="button" data-lang="en">EN</button></div></div>
+  <div class="tgl"><div class="lang" role="group" aria-label="Background / ozadje"><button type="button" data-theme="light" aria-label="Light / svetlo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button><button type="button" data-theme="dark" aria-label="Dark / temno"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg></button></div><button type="button" class="rst" id="resetPos" hidden></button><div class="lang" role="group" aria-label="Language / jezik"><button type="button" data-lang="sl">SL</button><button type="button" data-lang="en">EN</button></div></div>
 </header>
 <main class="flow" id="flow" tabindex="0" aria-label="Course flow, scroll horizontally"><div class="stage" id="stage"></div></main>
 
@@ -133,8 +139,10 @@ const TNP_PARTS=[0,1,2,3,4,5,6,7].map(i=>M+"tnp/tnp_lecture_part0"+i+".mp4");
 const TNP_SLIDES=Array.from({length:113},(_,i)=>M+"tnp_slides/s"+String(i+1).padStart(3,"0")+".jpg");
 const T=n=>M+"thumbs/tnp_s"+String(n).padStart(3,"0")+".jpg";
 const STUDENTS={pinto:"António Pinto",birk:"Konstantin Birk",djurdjevic:"Sanja Djurdjević",duranovic:"Nadija Duranović",figar:"Uroš Figar",pintaric:"Amadeja Pintarić",stemberger:"Mark Kristofer Štemberger",trcek:"Šana Trček",wandler:"Waleria Wandler"};
-const N=9;
-const MEDIA={tnp_video:{parts:TNP_PARTS},tnp_slides:{imgs:TNP_SLIDES}};
+const N=8;
+const TNP_SL_PARTS=Array.from({length:TNP_PARTS.length},(_,i)=>M+"tnp_sl/tnp_lecture_sl_part0"+i+".mp4");
+const TNP_SLIDES_SL=Array.from({length:113},(_,i)=>M+"tnp_slides_sl/s"+String(i+1).padStart(3,"0")+".jpg");
+const MEDIA={tnp_video:{parts:TNP_PARTS},tnp_video_sl:{parts:TNP_SL_PARTS},tnp_slides:{imgs:TNP_SLIDES},tnp_slides_sl:{imgs:TNP_SLIDES_SL}};
 const THUMB={};
 
 const ICON={
@@ -162,22 +170,22 @@ const PHASES=[
   kpis:[{v:8,l:"workshop types",ls:"tipov delavnic"},{v:7,of:N,l:"presentations",ls:"predstavitev"},{v:4,of:N,l:"5-min videos",ls:"5-minutnih videov"}],
   up:[{h:"Submitted online for feedback",sl:"Oddaja na spletu, odziv",dt:"29. 10."},{h:"Workshop types as 5-min videos",sl:"Videi v Teams",dt:"5. 11."}],
   down:"tk"},
- {id:"tnp",out:2,c:"yellow",status:"done",dates:"5.–12. 11.",w:380,title:"TNP: the real problem",sl:"TNP: resnični problem",
+ {id:"tnp",out:2,c:"yellow",status:"done",dates:"5.–12. 11.",w:380,title:"TNP: visitor management and its challenges",sl:"TNP: upravljanje in problematika",
   cover:[[1,0],[52,51],[56,55]],
   why:"Triglav National Park showed how it manages visitors at natural sites. The Savica Waterfall is the main case.",whySl:"Triglavski narodni park je predstavil, kako upravlja obisk naravnih vrednot. Glavni primer je slap Savica.",
   kpis:[{v:78,u:"min",l:"lecture, EN subtitles",ls:"predavanje, angleški podnapisi"},{v:113,l:"slides translated",ls:"prevedenih prosojnic"},{v:"1,500",vs:"1.500",l:"visitors/day, Savica capacity",ls:"obiskovalcev na dan, zmogljivost Savice"},{v:"350k",vs:"350.000",l:"Vintgar visitors, 2025",ls:"obiskovalcev Vintgarja, 2025"}],
-  up:[{feature:true,h:"Visitor management at natural sites",sl:"Aleš Zdešar, JZ TNP",dt:"12. 11.",media:[["Lecture, EN subtitles","tnp_video",true,"Predavanje, angleški podnapisi"],["Slides, EN","tnp_slides",false,"Prosojnice, EN"]],strip:true}],
+  up:[{feature:true,h:"Visitor management at natural sites",sl:"Aleš Zdešar, JZ TNP",dt:"12. 11.",quad:[["tnp_video",true,"Video · EN subtitles, translated slides","Video · angleški podnapisi, prevedene prosojnice",M+"thumbs/tnp_part00.jpg"],["tnp_video_sl",true,"Original video · Slovenian","Izvirni video · slovensko",M+"thumbs/tnp_sl_part00.jpg"],["tnp_slides",false,"Slides · English","Prosojnice · angleško",M+"thumbs/tnp_s001.jpg"],["tnp_slides_sl",false,"Original slides · Slovenian","Izvirne prosojnice · slovensko",M+"thumbs/tnp_slides_sl.jpg"]]}],
   down:[{ph:1,h:"Savica Waterfall",sl:"Slap Savica · main case",img:[56,55]},{ph:1,h:"Lepena Valley",sl:"Dolina Lepene",img:[84,83]},{ph:1,h:"Canyoning",sl:"Soteskanje",img:[96,95]},{h:"Your questions to TNP",sl:"Vaša vprašanja",dt:"12. 11."}]},
  {id:"plan",out:18,c:"cyan",status:"now",dates:"12.–26. 11.",title:"Problem and workshop plan",sl:"Problem in načrt delavnice",icon:"problem",
   why:"Pick one problem from the TNP discussion and design a workshop for it with one type from the toolkit. On 26 Nov we vote on the plan we run.",whySl:"Izberi en problem iz pogovora s TNP in zanj zasnuj delavnico z enim tipom iz nabora orodij. 26. 11. glasujemo, katero izvedemo.",
   kpis:[{v:0,of:N,l:"problems defined, 19. 11.",ls:"opredeljenih problemov, 19. 11."},{v:0,of:N,l:"plans as PDF, 26. 11.",ls:"načrtov v PDF, 26. 11."}],
   up:[{planned:true,h:"Corrections",sl:"Korekture",dt:"19. 11."},{planned:true,h:"Presentations and vote",sl:"Predstavitve, glasovanje",dt:"26. 11."}],
-  down:[{planned:true,u:9,h:"Problem definitions",sl:"Opredelitve problemov, 19. 11."},{planned:true,u:9,h:"Workshop plans (PDF)",sl:"Načrti delavnic, 26. 11."}]},
+  down:[{planned:true,u:8,h:"Problem definitions",sl:"Opredelitve problemov, 19. 11."},{planned:true,u:8,h:"Workshop plans (PDF)",sl:"Načrti delavnic, 26. 11."}]},
  {id:"workshop",out:10,c:"black",status:"planned",dates:"3.–17. 12.",title:"Running the workshop",sl:"Izvedba delavnice",icon:"workshop",
   why:"Everyone prepares the chosen workshop, runs it as a two-hour hackathon, then works on the results and a reflection.",whySl:"Vsi pripravimo izbrano delavnico, jo izvedemo kot dveurni hackathon in nato delamo na rezultatih in refleksiji.",
   kpis:[{v:2,u:"h",l:"hackathon",ls:"hackathon"},{v:"50%",vs:"50 %",l:"of the grade",ls:"ocene"}],
   up:[{planned:true,h:"Preparation",sl:"Priprava",dt:"3. 12."},{planned:true,h:"Workshop",sl:"Delavnica",dt:"10. 12."},{planned:true,h:"Wrap-up, reflection",sl:"Zaključek, refleksija",dt:"17. 12."}],
-  down:[{planned:true,u:3,h:"Workshop results",sl:"Rezultati delavnice"},{planned:true,u:9,h:"Reflection",sl:"Refleksija"}]},
+  down:[{planned:true,u:3,h:"Workshop results",sl:"Rezultati delavnice"},{planned:true,u:8,h:"Reflection",sl:"Refleksija"}]},
  {id:"publish",out:3,c:"yellow",status:"planned",dates:"7.–14. 1.",title:"Sharing the results",sl:"Objava rezultatov",icon:"publish",
   why:"Results go back to TNP: exhibition, web, booklet and a presentation in Bled. Dates to be confirmed.",whySl:"Rezultati se vrnejo v TNP: razstava, splet, knjižica in predstavitev na Bledu. Datumi še niso potrjeni.",
   kpis:[{v:"TBC",vs:"?",l:"dates",ls:"datumi v pripravi"}],
@@ -210,11 +218,14 @@ function outItems(p){
   return p.down.map(o=>({u:o.u||1,c:p.c,planned:o.planned,html:`${o.ph?`<span class="ph">${tr("Placeholder · TNP slide","Začasni primer · prosojnica TNP")}</span>`:""}${o.img?`<img class="thumb" src="${T(o.img[0])}" alt="" data-key="tnp_slides" data-idx="${o.img[1]}" data-title="TNP slides">`:""}<h4>${esc(tr(o.h,o.sl))}</h4>${o.sl?`<div class="sl">${esc(tr(o.sl,o.h))}</div>`:""}${o.dt?`<div class="dt">${esc(o.dt)}</div>`:""}`}));
 }
 function inItems(p){
-  return p.up.map(o=>({planned:o.planned,html:`${o.key?thumbImg(o.key,tr(o.h,o.sl)):""}<h4>${esc(tr(o.h,o.sl))}</h4>${o.sl?`<div class="sl">${esc(tr(o.sl,o.h))}</div>`:""}${o.dt?`<div class="dt">${esc(o.dt)}</div>`:""}${o.media?`<div class="meta">${o.media.map(m=>chip(m[0],m[1],m[2],o.h,m[3])).join("")}</div>`:""}${o.strip?`<div class="strip">${[0,1,2,3,4,5,6,7].map(i=>`<img src="${M}thumbs/tnp_part0${i}.jpg" alt="Part ${i+1}" loading="lazy" data-key="tnp_video" data-idx="${i}" data-title="${esc(o.h)}">`).join("")}</div>`:""}`}));
+  return p.up.map(o=>({planned:o.planned,html:`${o.key?thumbImg(o.key,tr(o.h,o.sl)):""}<h4>${esc(tr(o.h,o.sl))}</h4>${o.sl?`<div class="sl">${esc(tr(o.sl,o.h))}</div>`:""}${o.dt?`<div class="dt">${esc(o.dt)}</div>`:""}${o.media?`<div class="meta">${o.media.map(m=>chip(m[0],m[1],m[2],o.h,m[3])).join("")}</div>`:""}${o.quad?`<div class="quad">${o.quad.map(q=>`<button type="button" class="qt" data-key="${q[0]}" data-title="${esc(tr(q[2],q[3]))}"><img src="${q[4]}" alt="" loading="lazy"><span>${q[1]?"▶ ":""}${esc(tr(q[2],q[3]))}</span></button>`).join("")}</div>`:""}${o.strip?`<div class="strip">${[0,1,2,3,4,5,6,7].map(i=>`<img src="${M}thumbs/tnp_part0${i}.jpg" alt="Part ${i+1}" loading="lazy" data-key="tnp_video" data-idx="${i}" data-title="${esc(o.h)}">`).join("")}</div>`:""}`}));
 }
 PHASES.forEach(p=>{p.out=outItems(p).reduce((a,b)=>a+b.u,0)});
 const PICK=(location.hash.slice(1)&&PHASES.find(p=>p.id===location.hash.slice(1)))?location.hash.slice(1):"tnp";
 let openId=PICK;
+let POS={};try{POS=JSON.parse(localStorage.getItem("asin_pos")||"{}")}catch(e){}
+const off=k=>POS[k]||{dx:0,dy:0};
+function savePos(){try{localStorage.setItem("asin_pos",JSON.stringify(POS))}catch(e){}document.getElementById("resetPos").hidden=!Object.keys(POS).length}
 
 function kpiHtml(k){const val=k.of!=null?`${k.v}<small>/${k.of}</small>`:`${esc(tr(k.v,k.vs))}${k.u?`<small> ${k.u}</small>`:""}`;return `<div class="kpi"><div class="v">${val}</div><div class="l">${esc(tr(k.l,k.ls))}</div></div>`}
 function ribbon(x0,y0,x1,y1,w0,w1,fill,op,cls,data){
@@ -239,11 +250,11 @@ function draw(){
   let x=X0;const cols=PHASES.map(p=>{const w=p.id===openId?Wo:Wc;const c={p,x,w,nx:x+28};x+=w;return c});
   // measuring pass: header and meeting cards of the open theme decide where the band sits
   const oc=cols.find(c=>c.p.id===openId);
-  stage.innerHTML=headHtml(oc,cols.indexOf(oc),true,Wo,Wc)+`<div id="mt" style="position:absolute;left:${oc.x+20}px;top:0;display:flex;gap:12px;align-items:flex-start;width:${Wo-40}px">${inItems(oc.p).map(it=>`<div class="card${it.planned?" planned":""}" style="flex:1 1 0;max-width:240px;--c:${col(oc.p.c)}">${it.html}</div>`).join("")}</div>`;
+  stage.innerHTML=headHtml(oc,cols.indexOf(oc),true,Wo,Wc)+`<div id="mt" style="position:absolute;left:${oc.x+20}px;top:0;display:flex;gap:12px;align-items:flex-start;width:${Wo-40}px">${inItems(oc.p).map((it,j)=>{const k=oc.p.id+":i"+j,o=off(k);return `<div class="card drag${it.planned?" planned":""}" data-pk="${k}" style="flex:1 1 0;max-width:240px;--c:${col(oc.p.c)};transform:translate(${o.dx}px,${o.dy}px)">${it.html}</div>`}).join("")}</div>`;
   const hb=stage.querySelector(".head");const mt=stage.querySelector("#mt");
   const mtTop=hb.offsetTop+hb.offsetHeight+16;mt.style.top=mtTop+"px";
   const BT=Math.max(250,mtTop+mt.offsetHeight+48);
-  const mcards=[...mt.children].map(e=>({l:e.offsetLeft+oc.x+20,w:e.offsetWidth,b:mtTop+e.offsetTop+e.offsetHeight}));
+  const mcards=[...mt.children].map(e=>{const o=off(e.dataset.pk);return{l:e.offsetLeft+oc.x+20+o.dx,w:e.offsetWidth,b:mtTop+e.offsetTop+e.offsetHeight+o.dy}});
   const mtHtml=mt.outerHTML;
   const endX=x+70;
   let html="",svg="",defs="",bg="";
@@ -290,8 +301,8 @@ function draw(){
         svg+=`<path class="hit" data-open="${p.id}" d="${elbow(cl.nx,L.y,L.w,endX,stemB,L.w+14,12)}" fill="${fill}" fill-opacity="${planned?1:.92}"/>`;
         let acc=0;
         outs.forEach((it,j)=>{
-          const r=Math.floor(j/per),k=j%per;const cx=cl.x+20+k*(cw+12),cy=top+r*250;
-          html+=`<div class="card${it.planned?" planned":""}" style="position:absolute;left:${cx}px;top:${cy}px;width:${cw}px;--c:${col(c)}">${it.html}</div>`;
+          const r=Math.floor(j/per),k=j%per;const pk=p.id+":o"+j,po=off(pk);const cx=cl.x+20+k*(cw+12)+po.dx,cy=top+r*250+po.dy;
+          html+=`<div class="card drag${it.planned?" planned":""}" data-pk="${pk}" style="position:absolute;left:${cx}px;top:${cy}px;width:${cw}px;--c:${col(c)}">${it.html}</div>`;
           const w=it.u*U;
           if(r===0)svg+=ribbon(cl.nx+acc+w/2,stemB-1,cx+cw/2,cy,w,Math.max(w,6),fill,planned?1:.8);
           else svg+=ribbon(cl.nx+acc+w/2,stemB-1,cx-6,cy+20,w,3,fill,planned?.6:.45);
@@ -312,10 +323,16 @@ function draw(){
   return cols.find(c=>c.p.id===openId);
 }
 function openTheme(id,scroll){openId=id;peekId=null;const cl=draw();if(scroll!==false&&cl)flow.scrollTo({left:Math.max(0,cl.x-140)});history.replaceState(null,"","#"+id)}
+let drag=null,dragMoved=false;
+stage.addEventListener("pointerdown",e=>{const c=e.target.closest(".card.drag");if(!c||e.button!==0||e.target.closest("button,a,img,video"))return;const o=off(c.dataset.pk);drag={c,k:c.dataset.pk,x:e.clientX,y:e.clientY,dx:o.dx,dy:o.dy,abs:c.style.position==="absolute",l:parseFloat(c.style.left)||0,t:parseFloat(c.style.top)||0};dragMoved=false;c.setPointerCapture(e.pointerId)});
+stage.addEventListener("pointermove",e=>{if(!drag)return;const mx=e.clientX-drag.x,my=e.clientY-drag.y;if(!dragMoved&&Math.hypot(mx,my)<5)return;dragMoved=true;drag.c.classList.add("dragging");drag.c.style.transform=`translate(${drag.abs?mx:drag.dx+mx}px,${drag.abs?my:drag.dy+my}px)`;drag.mx=mx;drag.my=my});
+stage.addEventListener("pointerup",()=>{if(!drag)return;const d=drag;drag=null;if(dragMoved){POS[d.k]={dx:d.dx+d.mx,dy:d.dy+d.my};savePos();draw()}});
+stage.addEventListener("click",e=>{if(dragMoved){e.stopPropagation();e.preventDefault();dragMoved=false}},true);
 let peekId=null;function peek(id){if(id===peekId)return;peekId=id;stage.querySelectorAll(".peeking").forEach(e=>e.classList.remove("peeking"));if(id&&id!==openId)stage.querySelectorAll(`.head[data-open="${id}"],.colhit[data-open="${id}"]`).forEach(e=>e.classList.add("peeking"))}
 stage.addEventListener("pointerover",e=>{if(e.pointerType==="touch")return;const o=e.target.closest("[data-open]");peek(o?o.dataset.open:null)});
 stage.addEventListener("pointerleave",()=>peek(null));
 stage.addEventListener("click",e=>{const o=e.target.closest("[data-open]");if(o&&!e.target.closest("[data-key]")){openTheme(o.dataset.open)}});
+document.getElementById("resetPos").onclick=()=>{POS={};savePos();draw()};document.getElementById("resetPos").hidden=!Object.keys(POS).length;
 window.addMedia=(o,th)=>{Object.assign(MEDIA,o);if(th)Object.assign(THUMB,th);draw()};
 window.addEventListener("resize",()=>draw());
 // viewer
@@ -348,6 +365,7 @@ flow.addEventListener("wheel",e=>{if(Math.abs(e.deltaY)>Math.abs(e.deltaX)&&!e.s
 function setLang(l){LANG=l;try{localStorage.setItem("aisn_lang",l)}catch(e){}document.documentElement.lang=l;
   document.getElementById("intro").textContent=tr("Read left to right. The band is the course: meetings flow in from above, your work branches off below and keeps flowing, so the band widens. One theme is open at a time: click another theme to open it.","Beri od leve proti desni. Tok je predmet: srečanja pritekajo od zgoraj, vaše oddaje se odcepijo navzdol in tečejo naprej, zato se tok širi. Hkrati je odprta ena tema: za odprtje druge klikni nanjo.");
   document.getElementById("vclose").textContent=tr("Close","Zapri");
+  document.getElementById("resetPos").textContent=tr("Reset layout","Ponastavi postavitev");
   const lg=l==="en"?"en":"sl";document.getElementById("logoB").src=`brand/ul_fa_logo_hor_black_${lg}_v1_2026-11-14.png`;document.getElementById("logoW").src=`brand/ul_fa_logo_hor_white_${lg}_v1_2026-11-14.png`;
   document.getElementById("cname").textContent=tr("· Action and Strategic Planning","· Akcijsko in strateško načrtovanje");
   const cu=tr("https://www.fa.uni-lj.si/en/predmet/action-and-strategic-planning/","https://www.fa.uni-lj.si/predmet/akcijsko-in-stratesko-nacrtovanje/");
