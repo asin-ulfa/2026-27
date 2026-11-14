@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AISN 2026/27 course flow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Condensed:wght@400;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Layout: a Sankey river read left to right; students form the main band, meetings flow in from above, submissions branch off below, and every result keeps flowing so the band widens; only one theme is open at a time, like an accordion, and shows its items in place */
+  --paper:#f6f5f0; --ink:#1b1c1e; --muted:#6c6d70; --line:#dedcd4; --panel:#ffffff;
+  --cyan:#2aa7d8; --magenta:#d23d97; --yellow:#e9cf3c; --black:#8a4f3d; --student:#4b5a52;
+  --display:"IBM Plex Sans Condensed","Arial Narrow",Arial,sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  --body:"IBM Plex Sans","Segoe UI",Helvetica,Arial,sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--paper:#141513;--ink:#ecebe6;--muted:#9c9b95;--line:#2c2c29;--panel:#1d1e1c;--student:#a3b5ab;color-scheme:dark}
+}
+:root[data-theme="dark"]{--paper:#141513;--ink:#ecebe6;--muted:#9c9b95;--line:#2c2c29;--panel:#1d1e1c;--student:#a3b5ab;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:14px;line-height:1.4;display:flex;flex-direction:column;overflow:hidden}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.top{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 24px;padding:12px 20px 10px;border-bottom:1px solid var(--line)}
+.top h1{font-family:var(--display);font-size:20px;font-weight:700;margin:0;letter-spacing:.01em;text-wrap:balance}
+.top h1 span{font-weight:400;color:var(--muted)}
+.top p{margin:0;color:var(--muted);font-size:13px;max-width:72ch}
+.lang{display:flex;margin-left:auto;border:1px solid var(--line);border-radius:999px;overflow:hidden;align-self:center}
+.lang button{border:0;background:transparent;padding:4px 12px;font-family:var(--mono);font-size:12px;cursor:pointer;color:var(--muted)}
+.lang button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.flow{flex:1;min-height:0;overflow:auto;scroll-behavior:smooth;overscroll-behavior-x:contain;position:relative}
+@media (prefers-reduced-motion: reduce){.flow{scroll-behavior:auto}}
+.stage{position:relative}
+.stage svg{display:block}
+.lbl{position:absolute;font-family:var(--display);line-height:1.15;pointer-events:none;white-space:nowrap}
+.lbl.on-band{color:#fff;font-weight:600;font-size:15px;text-shadow:0 0 2px rgba(0,0,0,.25)}
+.hit{cursor:pointer}
+.hit:hover{filter:brightness(1.08)}
+.hit.sel{filter:brightness(1.1) saturate(1.2)}
+.term{position:absolute;background:none;border:0;padding:0;text-align:left;cursor:pointer;font-family:var(--display)}
+.term .n{font-family:var(--mono);font-size:22px;font-weight:600;font-variant-numeric:tabular-nums;display:block;line-height:1}
+.term .t{font-size:14px;display:block;margin-top:3px;max-width:150px;white-space:normal}
+.term .s{font-size:12px;color:var(--muted);display:block;max-width:150px;white-space:normal;font-style:italic}
+.term.planned .n{color:var(--muted)}
+.term[aria-pressed="true"] .t{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px}
+.head{position:absolute;top:10px;width:230px;background:none;border:0;padding:0;text-align:left;cursor:pointer}
+.head .num{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.head h2{font-family:var(--display);font-size:17px;font-weight:700;margin:2px 0 0;line-height:1.15;text-wrap:balance}
+.head .st{font-family:var(--body);font-size:10.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;border-radius:999px;padding:0 7px;border:1px solid currentColor;margin-left:4px}
+.head.now h2{color:var(--cyan)}
+.head.planned h2{color:var(--muted)}
+.head[aria-pressed="true"] h2{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px}
+
+.drawer{height:min(42vh,340px);border-top:2px solid var(--ink);background:var(--panel);display:flex;flex-direction:column;min-height:0}
+.dh{display:flex;align-items:baseline;gap:10px 18px;flex-wrap:wrap;padding:10px 20px 6px}
+.dh h3{font-family:var(--display);font-size:18px;margin:0;font-weight:700}
+.dh .sl{color:var(--muted);font-style:italic;font-size:13px}
+.dh .why{font-size:13px;color:var(--ink);max-width:80ch;margin:0;flex-basis:100%}
+.kpis{display:flex;gap:18px;flex-wrap:wrap;margin-left:auto}
+.kpi .v{font-family:var(--mono);font-size:20px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
+.kpi .v small{font-size:12px;color:var(--muted);font-weight:400}
+.kpi .l{font-size:11px;color:var(--muted)}
+.items{flex:1;min-height:0;overflow-x:auto;overflow-y:hidden;display:flex;gap:12px;padding:8px 20px 14px;align-items:stretch}
+.card{flex:none;width:220px;background:var(--paper);border:1px solid var(--line);border-top:4px solid var(--c,var(--ink));border-radius:6px;padding:8px 10px;overflow:auto}
+.card h4{font-size:13.5px;margin:0 0 2px;font-weight:600;text-wrap:balance}
+.card .who{font-size:12px;color:var(--muted)}
+.card .sl{font-size:12px;color:var(--muted);font-style:italic}
+.card .dt{font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+.card.planned{border-style:dashed;background:transparent}
+.card .meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.thumb{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:4px;margin:0 0 6px;background:var(--line);cursor:pointer}
+.ico{display:block;width:100%;height:56px;color:var(--c);margin-bottom:6px}
+.chip{font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;background:var(--panel);cursor:pointer;white-space:nowrap}
+.chip:hover{border-color:var(--ink)}
+.chip[aria-disabled="true"]{cursor:default;opacity:.55}
+.chip.v::before{content:"▶ ";font-size:9px}
+.strip{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
+.strip img{width:58px;aspect-ratio:16/9;object-fit:cover;border-radius:3px;border:1px solid var(--line);cursor:pointer}
+.ov{position:fixed;inset:0;background:rgba(10,12,14,.82);display:none;align-items:center;justify-content:center;z-index:20;padding:16px}
+.ov.open{display:flex}
+.vw{background:var(--panel);color:var(--ink);border-radius:8px;width:min(1180px,100%);max-height:100%;display:flex;flex-direction:column;overflow:hidden}
+.vh{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--line)}
+.vh h2{font-size:14px;margin:0;flex:1;text-wrap:balance}
+.vh button,.vf button{border:1px solid var(--line);background:var(--paper);border-radius:6px;padding:4px 10px;cursor:pointer}
+.vb{background:#000;display:flex;align-items:center;justify-content:center;flex:1;min-height:200px}
+.vb video,.vb img{max-width:100%;max-height:calc(100vh - 170px);display:block}
+.vf{display:flex;align-items:center;gap:8px;padding:8px 14px;flex-wrap:wrap;border-top:1px solid var(--line);font-size:12.5px}
+.vf .sp{flex:1}
+.vf button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.cnt{font-family:var(--mono);font-variant-numeric:tabular-nums;color:var(--muted)}
+@media (max-width:600px){.top{padding:10px 12px}.dh,.items{padding-left:12px;padding-right:12px}.drawer{height:46vh}}
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>AISN 2026/27 <span>· Action and Strategic Planning / Akcijsko in strateško načrtovanje</span></h1>
+  <p id="intro"></p>
+  <div class="lang" role="group" aria-label="Language / jezik"><button type="button" data-lang="sl">SL</button><button type="button" data-lang="en">EN</button></div>
+</header>
+<main class="flow" id="flow" tabindex="0" aria-label="Course flow, scroll horizontally"><div class="stage" id="stage"></div></main>
+
+<div class="ov" id="ov" role="dialog" aria-modal="true" aria-labelledby="vtitle">
+  <div class="vw">
+    <div class="vh"><h2 id="vtitle"></h2><button type="button" id="vclose">Close</button></div>
+    <div class="vb" id="vbody"></div>
+    <div class="vf" id="vfoot"></div>
+  </div>
+</div>
+<script>
+const M="media/";
+const TNP_PARTS=[0,1,2,3,4,5,6,7].map(i=>M+"tnp/tnp_lecture_part0"+i+".mp4");
+const TNP_SLIDES=Array.from({length:113},(_,i)=>M+"tnp_slides/s"+String(i+1).padStart(3,"0")+".jpg");
+const T=n=>M+"thumbs/tnp_s"+String(n).padStart(3,"0")+".jpg";
+const STUDENTS={pinto:"António Pinto",birk:"Konstantin Birk",djurdjevic:"Sanja Djurdjević",duranovic:"Nadija Duranović",figar:"Uroš Figar",pintaric:"Amadeja Pintarić",stemberger:"Mark Kristofer Štemberger",trcek:"Šana Trček",wandler:"Waleria Wandler"};
+const N=9;
+const MEDIA={tnp_video:{parts:TNP_PARTS},tnp_slides:{imgs:TNP_SLIDES}};
+const THUMB={};
+
+const ICON={
+ intro:'<svg class="ico" viewBox="0 0 120 58" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><rect x="22" y="6" width="76" height="40" rx="3"/><path d="M60 46v8M46 54h28M34 18h28M34 27h48M34 36h20"/></svg>',
+ talk:'<svg class="ico" viewBox="0 0 120 58" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h52v28H38l-12 10v-10h-8z"/><path d="M80 20h22v24h-6v8l-10-8H80"/><path d="M28 20h32M28 28h20"/></svg>',
+ kit:'<svg class="ico" viewBox="0 0 120 58" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="18" y="18" width="84" height="34" rx="4"/><path d="M46 18v-8h28v8M18 32h84M54 28v8h12v-8"/></svg>',
+ problem:'<svg class="ico" viewBox="0 0 120 58" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 52l26-32 16 16 14-12 38 28z"/><circle cx="86" cy="14" r="7"/></svg>',
+ workshop:'<svg class="ico" viewBox="0 0 120 58" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><rect x="38" y="20" width="44" height="22" rx="3"/><circle cx="26" cy="18" r="6"/><circle cx="94" cy="18" r="6"/><circle cx="26" cy="46" r="6"/><circle cx="94" cy="46" r="6"/><circle cx="60" cy="8" r="5"/><path d="M46 28h28M46 35h16"/></svg>',
+ publish:'<svg class="ico" viewBox="0 0 120 58" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M24 6h30l8 8v38H24z"/><path d="M62 14h-8V6"/><path d="M32 24h22M32 32h22M32 40h14"/><rect x="72" y="14" width="26" height="38" rx="2"/><path d="M78 24h14M78 32h14M78 40h10"/></svg>'
+};
+
+const PHASES=[
+ {id:"basics",out:0,c:"black",w:620,status:"done",dates:"1.–15. 10.",title:"Workshop basics",sl:"Osnove delavnic",icon:"intro",
+  why:"What action planning is, which workshop types exist and how a workshop works as a mechanism.",whySl:"Kaj je akcijsko načrtovanje, kateri tipi delavnic obstajajo in kako delavnica deluje kot mehanizem.",
+  kpis:[{v:3,l:"lectures",ls:"predavanja"},{v:N,l:"students",ls:"študentov"}],
+  up:[{h:"Introduction",sl:"Uvod",dt:"1. 10.",key:"lec_0",media:[["Slides","lec_0",false,"Prosojnice"]]},{h:"Action and strategic planning",sl:"Akcijsko in strateško načrtovanje",dt:"8. 10.",key:"lec_1",media:[["Slides","lec_1",false,"Prosojnice"]]},{h:"Urban design workshops: methods and formats",sl:"Urbanistične delavnice: metode in oblike",dt:"15. 10.",key:"lec_2",media:[["Slides","lec_2",false,"Prosojnice"]]}],
+  down:[]},
+ {id:"pechakucha",out:8,c:"cyan",status:"done",dates:"15.–22. 10.",title:"A workshop I attended",sl:"Analiza obiskane delavnice",icon:"talk",
+  why:"Each of you looked back at a real workshop: topic, process, method and what stayed with you, in about two minutes.",whySl:"Vsak je v približno dveh minutah predstavil resnično delavnico, ki se je je udeležil: temo, potek, metodo in kaj mu je ostalo v spominu.",
+  kpis:[{v:8,of:N,l:"PechaKucha submitted",ls:"oddanih PechaKucha"},{v:"~2",u:"min",l:"per talk",ls:"na predstavitev"}],
+  up:[{h:"Workshop analyses, PechaKucha",sl:"Analize delavnic",dt:"22. 10."}],
+  down:"pk"},
+ {id:"toolkit",out:11,c:"magenta",status:"done",dates:"22. 10.–5. 11.",w:520,title:"Workshop toolkit: teach the teacher",sl:"Tipi delavnic: naučimo učitelja",icon:"kit",
+  why:"Each of you taught the group one workshop type, with its strengths and weaknesses. Together they are our toolkit for the TNP workshop.",whySl:"Vsak je skupino naučil en tip delavnice, z njegovimi prednostmi in slabostmi. Skupaj so naš nabor orodij za delavnico s TNP.",
+  kpis:[{v:8,l:"workshop types",ls:"tipov delavnic"},{v:7,of:N,l:"presentations",ls:"predstavitev"},{v:4,of:N,l:"5-min videos",ls:"5-minutnih videov"}],
+  up:[{h:"Submitted online for feedback",sl:"Oddaja na spletu, odziv",dt:"29. 10."},{h:"Workshop types as 5-min videos",sl:"Videi v Teams",dt:"5. 11."}],
+  down:"tk"},
+ {id:"tnp",out:2,c:"yellow",status:"done",dates:"5.–12. 11.",w:380,title:"TNP: the real problem",sl:"TNP: resnični problem",
+  cover:[[1,0],[52,51],[56,55]],
+  why:"Triglav National Park showed how it manages visitors at natural sites. The Savica Waterfall is the main case.",whySl:"Triglavski narodni park je predstavil, kako upravlja obisk naravnih vrednot. Glavni primer je slap Savica.",
+  kpis:[{v:78,u:"min",l:"lecture, EN subtitles",ls:"predavanje, angleški podnapisi"},{v:113,l:"slides translated",ls:"prevedenih prosojnic"},{v:"1,500",vs:"1.500",l:"visitors/day, Savica capacity",ls:"obiskovalcev na dan, zmogljivost Savice"},{v:"350k",vs:"350.000",l:"Vintgar visitors, 2025",ls:"obiskovalcev Vintgarja, 2025"}],
+  up:[{feature:true,h:"Visitor management at natural sites",sl:"Aleš Zdešar, JZ TNP",dt:"12. 11.",media:[["Lecture, EN subtitles","tnp_video",true,"Predavanje, angleški podnapisi"],["Slides, EN","tnp_slides",false,"Prosojnice, EN"]],strip:true}],
+  down:[{h:"Savica Waterfall",sl:"Slap Savica · main case",img:[56,55]},{h:"Lepena Valley",sl:"Dolina Lepene",img:[84,83]},{h:"Canyoning",sl:"Soteskanje",img:[96,95]},{h:"Your questions to TNP",sl:"Vaša vprašanja",dt:"12. 11."}]},
+ {id:"plan",out:18,c:"cyan",status:"now",dates:"12.–26. 11.",title:"Problem and workshop plan",sl:"Problem in načrt delavnice",icon:"problem",
+  why:"Pick one problem from the TNP discussion and design a workshop for it with one type from the toolkit. On 26 Nov we vote on the plan we run.",whySl:"Izberi en problem iz pogovora s TNP in zanj zasnuj delavnico z enim tipom iz nabora orodij. 26. 11. glasujemo, katero izvedemo.",
+  kpis:[{v:0,of:N,l:"problems defined, 19. 11.",ls:"opredeljenih problemov, 19. 11."},{v:0,of:N,l:"plans as PDF, 26. 11.",ls:"načrtov v PDF, 26. 11."}],
+  up:[{planned:true,h:"Corrections",sl:"Korekture",dt:"19. 11."},{planned:true,h:"Presentations and vote",sl:"Predstavitve, glasovanje",dt:"26. 11."}],
+  down:[{planned:true,u:9,h:"Problem definitions",sl:"Opredelitve problemov, 19. 11."},{planned:true,u:9,h:"Workshop plans (PDF)",sl:"Načrti delavnic, 26. 11."}]},
+ {id:"workshop",out:10,c:"black",status:"planned",dates:"3.–17. 12.",title:"Running the workshop",sl:"Izvedba delavnice",icon:"workshop",
+  why:"Everyone prepares the chosen workshop, runs it as a two-hour hackathon, then works on the results and a reflection.",whySl:"Vsi pripravimo izbrano delavnico, jo izvedemo kot dveurni hackathon in nato delamo na rezultatih in refleksiji.",
+  kpis:[{v:2,u:"h",l:"hackathon",ls:"hackathon"},{v:"50%",vs:"50 %",l:"of the grade",ls:"ocene"}],
+  up:[{planned:true,h:"Preparation",sl:"Priprava",dt:"3. 12."},{planned:true,h:"Workshop",sl:"Delavnica",dt:"10. 12."},{planned:true,h:"Wrap-up, reflection",sl:"Zaključek, refleksija",dt:"17. 12."}],
+  down:[{planned:true,u:3,h:"Workshop results",sl:"Rezultati delavnice"},{planned:true,u:9,h:"Reflection",sl:"Refleksija"}]},
+ {id:"publish",out:3,c:"yellow",status:"planned",dates:"7.–14. 1.",title:"Sharing the results",sl:"Objava rezultatov",icon:"publish",
+  why:"Results go back to TNP: exhibition, web, booklet and a presentation in Bled. Dates to be confirmed.",whySl:"Rezultati se vrnejo v TNP: razstava, splet, knjižica in predstavitev na Bledu. Datumi še niso potrjeni.",
+  kpis:[{v:"TBC",vs:"?",l:"dates",ls:"datumi v pripravi"}],
+  up:[{planned:true,h:"Presentation to TNP, Bled",sl:"Predstavitev TNP",dt:"7. 1."}],
+  down:[{planned:true,u:2,h:"Exhibition",sl:"Razstava"},{planned:true,u:2,h:"Web and booklet",sl:"Splet in knjižica"}]}
+];
+const PK=[{who:"pinto",h:"Looking beyond the building",hs:"Pogled onkraj stavbe"},{who:"birk",h:"What about the furniture? Workhome workshop",hs:"Kaj pa pohištvo? Delavnica workhome"},{who:"djurdjevic",h:"Atelier Bali",hs:"Atelier Bali"},{who:"duranovic",h:"Design thinking workshop",hs:"Delavnica design thinking"},{who:"figar",h:"Mycelium in architecture",hs:"Uporaba micelija v arhitekturi"},{who:"stemberger",h:"Rural heritage and the architecture of food production",hs:"Podeželska dediščina in arhitektura pridelave hrane"},{who:"trcek"},{who:"wandler",h:"Bremer Platz, Münster, 2019",hs:"Bremer Platz, Münster, 2019"}];
+const TOOLKIT=[
+ {type:"Tactical urbanism",sl:"Taktični urbanizem",who:"pinto",pres:true,video:true},
+ {type:"Temporary use",sl:"Začasna raba",who:"birk",pres:true},
+ {type:"World café",sl:"Svetovna kavarna",who:"djurdjevic",pres:true},
+ {type:"City walks",sl:"Mestni sprehodi",who:"duranovic",pres:true},
+ {type:"Open space",sl:"Odprti prostor",who:"figar",pres:true},
+ {type:"Charrette",sl:"Šarete",who:"pintaric",video:true},
+ {type:"Exquisite corpse",sl:"Izjemno truplo",who:"trcek",pres:true,video:true},
+ {type:"Future workshop",sl:"Delavnica prihodnosti",who:"wandler",pres:true,video:true}
+];
+
+let LANG="en";try{LANG=localStorage.getItem("aisn_lang")||"en"}catch(e){}
+const tr=(en,sl)=>LANG==="sl"?(sl!=null?sl:en):en;
+const plSl=(n,f)=>{const m=n%100;return m===1?f[0]:m===2?f[1]:(m===3||m===4)?f[2]:f[3]};
+const stage=document.getElementById("stage"),flow=document.getElementById("flow");
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function chip(label,key,isVideo,title,labelSl){label=tr(label,labelSl);const has=!!MEDIA[key];return `<button type="button" class="chip${isVideo?" v":""}" data-key="${key}" data-title="${esc(title)}" ${has?"":'aria-disabled="true" title="File not added yet"'}>${esc(label)}</button>`}
+function thumbImg(key,title){const t=THUMB[key];return t?`<img class="thumb" src="${t}" alt="" loading="lazy" data-key="${key}" data-title="${esc(title)}">`:""}
+// items below the band for a theme
+function outItems(p){
+  if(p.down==="pk")return PK.map(x=>{const n=STUDENTS[x.who],k="pk_"+x.who;return{u:1,c:p.c,html:`${thumbImg(k,"PechaKucha · "+n)}<h4>${esc(tr(x.h||"Workshop I attended",x.hs||"Delavnica, ki sem se je udeležil"))}</h4><div class="who">${esc(n)}</div><div class="meta">${chip("Slides",k,false,"PechaKucha · "+n,"Prosojnice")}</div>`}});
+  if(p.down==="tk")return TOOLKIT.map(t=>{const n=STUDENTS[t.who];let m="";if(t.video)m+=chip("Video","tv_"+t.who,true,tr(t.type,t.sl)+" · "+n,"Video");if(t.pres)m+=chip("Presentation","tk_"+t.who,false,tr(t.type,t.sl)+" · "+n,"Predstavitev");return{u:(t.pres?1:0)+(t.video?1:0),c:p.c,html:`${thumbImg("tv_"+t.who,t.type)||thumbImg("tk_"+t.who,t.type)}<h4>${esc(tr(t.type,t.sl))}</h4><div class="sl">${esc(tr(t.sl,t.type))}</div><div class="who">${esc(n)}</div><div class="meta">${m}</div>`}});
+  return p.down.map(o=>({u:o.u||1,c:p.c,planned:o.planned,html:`${o.img?`<img class="thumb" src="${T(o.img[0])}" alt="" data-key="tnp_slides" data-idx="${o.img[1]}" data-title="TNP slides">`:""}<h4>${esc(tr(o.h,o.sl))}</h4>${o.sl?`<div class="sl">${esc(tr(o.sl,o.h))}</div>`:""}${o.dt?`<div class="dt">${esc(o.dt)}</div>`:""}`}));
+}
+function inItems(p){
+  return p.up.map(o=>({planned:o.planned,html:`${o.key?thumbImg(o.key,tr(o.h,o.sl)):""}<h4>${esc(tr(o.h,o.sl))}</h4>${o.sl?`<div class="sl">${esc(tr(o.sl,o.h))}</div>`:""}${o.dt?`<div class="dt">${esc(o.dt)}</div>`:""}${o.media?`<div class="meta">${o.media.map(m=>chip(m[0],m[1],m[2],o.h,m[3])).join("")}</div>`:""}${o.strip?`<div class="strip">${[0,1,2,3,4,5,6,7].map(i=>`<img src="${M}thumbs/tnp_part0${i}.jpg" alt="Part ${i+1}" loading="lazy" data-key="tnp_video" data-idx="${i}" data-title="${esc(o.h)}">`).join("")}</div>`:""}`}));
+}
+PHASES.forEach(p=>{p.out=outItems(p).reduce((a,b)=>a+b.u,0)});
+const PICK=(location.hash.slice(1)&&PHASES.find(p=>p.id===location.hash.slice(1)))?location.hash.slice(1):"tnp";
+let openId=PICK;
+
+function kpiHtml(k){const val=k.of!=null?`${k.v}<small>/${k.of}</small>`:`${esc(tr(k.v,k.vs))}${k.u?`<small> ${k.u}</small>`:""}`;return `<div class="kpi"><div class="v">${val}</div><div class="l">${esc(tr(k.l,k.ls))}</div></div>`}
+function ribbon(x0,y0,x1,y1,w0,w1,fill,op,cls,data){
+  const my=(y0+y1)/2;
+  // vertical-ish ribbon: (x0,y0) top centre to (x1,y1) bottom centre, widths w0/w1 horizontal
+  return `<path${cls?` class="${cls}"`:""}${data||""} d="M${x0-w0/2} ${y0} C ${x0-w0/2} ${my}, ${x1-w1/2} ${my}, ${x1-w1/2} ${y1} L ${x1+w1/2} ${y1} C ${x1+w1/2} ${my}, ${x0+w0/2} ${my}, ${x0+w0/2} ${y0} Z" fill="${fill}" fill-opacity="${op}"/>`;
+}
+function headHtml(cl,i,open,Wo,Wc){
+  const p=cl.p,st=LANG==="sl"?{done:"zaključeno",now:"v teku",planned:"načrtovano"}[p.status]:{done:"done",now:"in progress",planned:"planned"}[p.status];
+  return `<button type="button" class="head ${p.status}" data-open="${p.id}" aria-pressed="${open}" style="left:${cl.x+12}px;width:${open?Wo-30:Wc-18}px"><span class="num">${String(i+1).padStart(2,"0")} · ${esc(p.dates)}${open?`<span class="st">${st}</span>`:""}</span><h2 style="font-size:${open?22:14}px">${esc(open?tr(p.title,p.sl):tr(p.title,p.sl).split(":")[0])}</h2>${open?`<div style="font-family:var(--body);font-size:13px;color:var(--muted);font-style:italic">${esc(tr(p.sl,p.title))}</div><p style="font-family:var(--body);font-size:13px;margin:6px 0 0;max-width:62ch;white-space:normal">${esc(tr(p.why,p.whySl))}</p><div class="kpis" style="margin:10px 0 0;justify-content:flex-start">${p.kpis.map(kpiHtml).join("")}</div>`:""}</button>`;
+}
+const KA=0.5523;
+// one strand: rises from below in a vertical stem, turns with rounded corners and continues right in the band
+function elbow(vx,y,w,endX,ty,Ro,Ri){
+  Ro=Math.min(Ro,ty-y-4);Ri=Math.max(4,Ri);
+  return `M${vx+Ro} ${y} L ${endX} ${y} L ${endX} ${y+w} L ${vx+w+Ri} ${y+w} C ${vx+w+Ri-KA*Ri} ${y+w}, ${vx+w} ${y+w+Ri-KA*Ri}, ${vx+w} ${y+w+Ri} L ${vx+w} ${ty} L ${vx} ${ty} L ${vx} ${y+Ro} C ${vx} ${y+Ro-KA*Ro}, ${vx+Ro-KA*Ro} ${y}, ${vx+Ro} ${y} Z`;
+}
+function draw(){
+  const cs=getComputedStyle(document.documentElement),col=n=>cs.getPropertyValue("--"+n).trim();
+  const U=3.2, Wc=118, Wo=Math.max(560,Math.min(760,flow.clientWidth-Wc*PHASES.length+Wc-160));
+  const X0=150;
+  let x=X0;const cols=PHASES.map(p=>{const w=p.id===openId?Wo:Wc;const c={p,x,w,nx:x+28};x+=w;return c});
+  // measuring pass: header and meeting cards of the open theme decide where the band sits
+  const oc=cols.find(c=>c.p.id===openId);
+  stage.innerHTML=headHtml(oc,cols.indexOf(oc),true,Wo,Wc)+`<div id="mt" style="position:absolute;left:${oc.x+20}px;top:0;display:flex;gap:12px;align-items:flex-start;width:${Wo-40}px">${inItems(oc.p).map(it=>`<div class="card${it.planned?" planned":""}" style="flex:1 1 0;max-width:240px;--c:${col(oc.p.c)}">${it.html}</div>`).join("")}</div>`;
+  const hb=stage.querySelector(".head");const mt=stage.querySelector("#mt");
+  const mtTop=hb.offsetTop+hb.offsetHeight+16;mt.style.top=mtTop+"px";
+  const BT=Math.max(250,mtTop+mt.offsetHeight+48);
+  const mcards=[...mt.children].map(e=>({l:e.offsetLeft+oc.x+20,w:e.offsetWidth,b:mtTop+e.offsetTop+e.offsetHeight}));
+  const mtHtml=mt.outerHTML;
+  const endX=x+70;
+  let html="",svg="",defs="";
+  ["cyan","magenta","yellow","black","student"].forEach(c=>{defs+=`<pattern id="h-${c}" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="7" height="7" fill="${col(c)}" fill-opacity=".18"/><rect width="2.6" height="7" fill="${col(c)}" fill-opacity=".75"/></pattern>`});
+  // layers of the band
+  const layers=[{c:"student",w:N*U,x0:20,label:`${N} students`}];
+  cols.forEach(cl=>{if(cl.p.out)layers.push({c:cl.p.c,w:cl.p.out*U,x0:cl.nx,planned:cl.p.status!=="done",id:cl.p.id})});
+  let off=BT;layers.forEach(L=>{L.y=off;off+=L.w});
+  const bandBottomAt=xx=>layers.filter(L=>L.x0<=xx).reduce((a,L)=>Math.max(a,L.y+L.w),BT);
+  // draw layers
+  layers.filter(L=>!L.id).forEach(L=>{
+    const fill=L.planned?`url(#h-${L.c})`:col(L.c);
+    svg+=`<path class="hit"${L.id?` data-open="${L.id}"`:""} d="M${L.x0} ${L.y} L ${endX} ${L.y} L ${endX} ${L.y+L.w} L ${L.x0} ${L.y+L.w} Z" fill="${fill}" fill-opacity="${L.planned?1:.92}"/>`;
+  });
+  html+=`<div class="lbl" style="left:20px;top:${BT-26}px;font-size:14px;font-weight:600">${N}</div><div class="lbl on-band" style="left:28px;top:${BT+4}px;font-size:13px">${tr("students","študentov")}</div>`;
+  html+=`<div class="lbl" style="left:${endX+8}px;top:${BT-4}px;font-size:13px;color:var(--muted)">${layers.reduce((a,L)=>a+(L.c==="student"?0:L.w/U),0)} ${tr("results<br>planned and done","rezultatov,<br>načrtovanih in opravljenih")}</div>`;
+  // theme columns
+  cols.forEach((cl,i)=>{
+    const p=cl.p,open=p.id===openId,c=p.c,planned=p.status!=="done",fill=planned?`url(#h-${c})`:col(c);
+    // separator
+    svg+=`<line x1="${cl.x}" y1="0" x2="${cl.x}" y2="2000" stroke="${col("line")}" stroke-width="1"/>`;
+    html+=headHtml(cl,i,open,Wo,Wc);
+    // meetings inflow
+    const ins=inItems(p);
+    if(ins.length){
+      if(open){
+        html+=mtHtml;
+        mcards.forEach((m,j)=>{svg+=ribbon(m.l+m.w/2,m.b,cl.nx+6+j*7,BT,5,5,col(c),planned?.4:.8)});
+      }else{
+        svg+=ribbon(cl.nx+8,BT-60,cl.nx+8,BT,ins.length*4,ins.length*4,col(c),planned?.35:.7,"hit",` data-open="${p.id}"`);
+        html+=`<div class="lbl" style="left:${cl.nx+16+ins.length*2}px;top:${BT-62}px;font-size:12px;color:var(--muted)">${ins.length} ${tr(ins.length>1?"meetings":"meeting",plSl(ins.length,["srečanje","srečanji","srečanja","srečanj"]))}</div>`;
+      }
+    }
+    // results branch
+    const outs=outItems(p);
+    const L=layers.find(L=>L.id===p.id);
+    if(outs.length&&L){
+      const bb=bandBottomAt(cl.x+cl.w);
+      if(open){
+        const per=Math.max(1,Math.floor((Wo-40)/232));const cw=Math.min(220,(Wo-40)/per-12);
+        const top=bandBottomAt(endX)+70;
+        const stemB=top-60;
+        svg+=`<path class="hit" data-open="${p.id}" d="${elbow(cl.nx,L.y,L.w,endX,stemB,L.w+14,12)}" fill="${fill}" fill-opacity="${planned?1:.92}"/>`;
+        let acc=0;
+        outs.forEach((it,j)=>{
+          const r=Math.floor(j/per),k=j%per;const cx=cl.x+20+k*(cw+12),cy=top+r*250;
+          html+=`<div class="card${it.planned?" planned":""}" style="position:absolute;left:${cx}px;top:${cy}px;width:${cw}px;--c:${col(c)}">${it.html}</div>`;
+          const w=it.u*U;
+          if(r===0)svg+=ribbon(cl.nx+acc+w/2,stemB-1,cx+cw/2,cy,w,Math.max(w,6),fill,planned?1:.8);
+          else svg+=ribbon(cl.nx+acc+w/2,stemB-1,cx-6,cy+20,w,3,fill,planned?.6:.45);
+          acc+=w;
+        });
+        html+=`<div class="lbl" style="left:${cl.nx+L.w+16}px;top:${L.y+L.w+18}px;font-size:13px;color:var(--muted)">${p.out} ${p.down==="tk"?tr("items",plSl(p.out,["izdelek","izdelka","izdelki","izdelkov"])):tr("submissions",plSl(p.out,["oddaja","oddaji","oddaje","oddaj"]))}</div>`;
+        cl.h=top+Math.ceil(outs.length/per)*250;
+      }else{
+        const ty=bandBottomAt(endX)+70;
+        svg+=`<path class="hit" data-open="${p.id}" d="${elbow(cl.nx,L.y,L.w,endX,ty,L.w+14,12)}" fill="${fill}" fill-opacity="${planned?1:.92}"/>`;
+        html+=`<button type="button" class="term${planned?" planned":""}" data-open="${p.id}" style="left:${cl.nx}px;top:${ty+6}px"><span class="n">${p.out}</span><span class="t" style="max-width:${Wc-34}px">${p.down==="pk"?"PechaKucha":p.down==="tk"?tr("toolkit items","izdelkov za nabor orodij"):esc(tr((p.down[0]||{}).h||"",(p.down[0]||{}).sl))}</span></button>`;
+      }
+    }
+  });
+  const H=Math.max(flow.clientHeight-4,...cols.map(c=>c.h||0),bandBottomAt(endX)+180);
+  stage.style.width=(endX+150)+"px";stage.style.height=H+"px";
+  stage.innerHTML=`<svg width="${endX+150}" height="${H}" viewBox="0 0 ${endX+150} ${H}" aria-hidden="true"><defs>${defs}</defs>${svg}</svg>${html}`;
+  return cols.find(c=>c.p.id===openId);
+}
+function openTheme(id,scroll){openId=id;const cl=draw();if(scroll!==false&&cl)flow.scrollTo({left:Math.max(0,cl.x-140)});history.replaceState(null,"","#"+id)}
+stage.addEventListener("click",e=>{const o=e.target.closest("[data-open]");if(o&&!e.target.closest("[data-key]")){openTheme(o.dataset.open)}});
+window.addMedia=(o,th)=>{Object.assign(MEDIA,o);if(th)Object.assign(THUMB,th);draw()};
+window.addEventListener("resize",()=>draw());
+// viewer
+const ov=document.getElementById("ov"),vbody=document.getElementById("vbody"),vfoot=document.getElementById("vfoot"),vtitle=document.getElementById("vtitle");
+let cur=null,idx=0,lastFocus=null;
+function el(t,c,h){const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e}
+function show(){
+  vbody.innerHTML="";vfoot.innerHTML="";
+  if(cur.parts){
+    const v=document.createElement("video");v.controls=true;v.preload="metadata";v.playsInline=true;v.src=cur.parts[idx];vbody.appendChild(v);
+    v.addEventListener("ended",()=>{if(idx<cur.parts.length-1){idx++;show();vbody.querySelector("video").play().catch(()=>{})}});
+    if(cur.parts.length>1){vfoot.appendChild(el("span","cnt",tr("Part","Del")));cur.parts.forEach((p,i)=>{const b=el("button",i===idx?"on":"",String(i+1));b.type="button";b.onclick=()=>{idx=i;show()};vfoot.appendChild(b)});vfoot.appendChild(el("span","sp"));vfoot.appendChild(el("span","cnt",tr("about 10 min each, plays on","po približno 10 min, predvaja se naprej")))}
+  }else{
+    const im=document.createElement("img");im.src=cur.imgs[idx];im.alt=vtitle.textContent+", slide "+(idx+1);vbody.appendChild(im);
+    const p=el("button","",tr("← Previous","← Prejšnja"));p.type="button";p.disabled=idx===0;p.onclick=()=>step(-1);
+    const n=el("button","",tr("Next →","Naslednja →"));n.type="button";n.disabled=idx===cur.imgs.length-1;n.onclick=()=>step(1);
+    vfoot.append(p,n,el("span","sp"),el("span","cnt",`${idx+1} / ${cur.imgs.length}`));
+    if(cur.imgs[idx+1]){const pre=new Image();pre.src=cur.imgs[idx+1]}
+  }
+}
+function step(d){if(!cur||!cur.imgs)return;idx=Math.max(0,Math.min(cur.imgs.length-1,idx+d));show()}
+function open(key,title,start){const m=MEDIA[key];if(!m)return;cur=m;idx=start||0;vtitle.textContent=title||"";lastFocus=document.activeElement;ov.classList.add("open");show();document.getElementById("vclose").focus()}
+function close(){ov.classList.remove("open");vbody.innerHTML="";cur=null;if(lastFocus)lastFocus.focus()}
+document.addEventListener("click",e=>{const c=e.target.closest("[data-key]");if(!c||c.getAttribute("aria-disabled")==="true")return;open(c.dataset.key,c.dataset.title,+(c.dataset.idx||0))});
+document.getElementById("vclose").onclick=close;
+ov.addEventListener("click",e=>{if(e.target===ov)close()});
+document.addEventListener("keydown",e=>{if(!ov.classList.contains("open"))return;if(e.key==="Escape")close();if(e.key==="ArrowRight")step(1);if(e.key==="ArrowLeft")step(-1)});
+
+flow.addEventListener("wheel",e=>{if(Math.abs(e.deltaY)>Math.abs(e.deltaX)&&!e.shiftKey&&flow.scrollHeight<=flow.clientHeight+4){flow.scrollLeft+=e.deltaY;e.preventDefault()}},{passive:false});
+function setLang(l){LANG=l;try{localStorage.setItem("aisn_lang",l)}catch(e){}document.documentElement.lang=l;
+  document.getElementById("intro").textContent=tr("Read left to right. The band is the course: meetings flow in from above, your work branches off below and keeps flowing, so the band widens. One theme is open at a time: click another theme to open it.","Beri od leve proti desni. Tok je predmet: srečanja pritekajo od zgoraj, vaše oddaje se odcepijo navzdol in tečejo naprej, zato se tok širi. Hkrati je odprta ena tema: za odprtje druge klikni nanjo.");
+  document.getElementById("vclose").textContent=tr("Close","Zapri");
+  document.querySelectorAll(".lang button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.lang===l));
+  draw();}
+document.querySelectorAll(".lang button").forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
+setLang(LANG);
+requestAnimationFrame(()=>openTheme(openId));
+</script>
+<script src="media.js"></script>
+<script src="lectures.js"></script>
+</body>
+</html>
