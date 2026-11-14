@@ -224,7 +224,7 @@ PHASES.forEach(p=>{p.out=outItems(p).reduce((a,b)=>a+b.u,0)});
 const PICK=(location.hash.slice(1)&&PHASES.find(p=>p.id===location.hash.slice(1)))?location.hash.slice(1):"tnp";
 let openId=PICK;
 let POS={};try{POS=JSON.parse(localStorage.getItem("asin_pos")||"{}")}catch(e){}
-const off=k=>POS[k]||{dx:0,dy:0};
+const posOf=k=>POS[k]||{dx:0,dy:0};
 function savePos(){try{localStorage.setItem("asin_pos",JSON.stringify(POS))}catch(e){}document.getElementById("resetPos").hidden=!Object.keys(POS).length}
 
 function kpiHtml(k){const val=k.of!=null?`${k.v}<small>/${k.of}</small>`:`${esc(tr(k.v,k.vs))}${k.u?`<small> ${k.u}</small>`:""}`;return `<div class="kpi"><div class="v">${val}</div><div class="l">${esc(tr(k.l,k.ls))}</div></div>`}
@@ -250,11 +250,11 @@ function draw(){
   let x=X0;const cols=PHASES.map(p=>{const w=p.id===openId?Wo:Wc;const c={p,x,w,nx:x+28};x+=w;return c});
   // measuring pass: header and meeting cards of the open theme decide where the band sits
   const oc=cols.find(c=>c.p.id===openId);
-  stage.innerHTML=headHtml(oc,cols.indexOf(oc),true,Wo,Wc)+`<div id="mt" style="position:absolute;left:${oc.x+20}px;top:0;display:flex;gap:12px;align-items:flex-start;width:${Wo-40}px">${inItems(oc.p).map((it,j)=>{const k=oc.p.id+":i"+j,o=off(k);return `<div class="card drag${it.planned?" planned":""}" data-pk="${k}" style="flex:1 1 0;max-width:240px;--c:${col(oc.p.c)};transform:translate(${o.dx}px,${o.dy}px)">${it.html}</div>`}).join("")}</div>`;
+  stage.innerHTML=headHtml(oc,cols.indexOf(oc),true,Wo,Wc)+`<div id="mt" style="position:absolute;left:${oc.x+20}px;top:0;display:flex;gap:12px;align-items:flex-start;width:${Wo-40}px">${inItems(oc.p).map((it,j)=>{const k=oc.p.id+":i"+j,o=posOf(k);return `<div class="card drag${it.planned?" planned":""}" data-pk="${k}" style="flex:1 1 0;max-width:240px;--c:${col(oc.p.c)};transform:translate(${o.dx}px,${o.dy}px)">${it.html}</div>`}).join("")}</div>`;
   const hb=stage.querySelector(".head");const mt=stage.querySelector("#mt");
   const mtTop=hb.offsetTop+hb.offsetHeight+16;mt.style.top=mtTop+"px";
   const BT=Math.max(250,mtTop+mt.offsetHeight+48);
-  const mcards=[...mt.children].map(e=>{const o=off(e.dataset.pk);return{l:e.offsetLeft+oc.x+20+o.dx,w:e.offsetWidth,b:mtTop+e.offsetTop+e.offsetHeight+o.dy}});
+  const mcards=[...mt.children].map(e=>{const o=posOf(e.dataset.pk);return{l:e.offsetLeft+oc.x+20+o.dx,w:e.offsetWidth,b:mtTop+e.offsetTop+e.offsetHeight+o.dy}});
   const mtHtml=mt.outerHTML;
   const endX=x+70;
   let html="",svg="",defs="",bg="";
@@ -301,7 +301,7 @@ function draw(){
         svg+=`<path class="hit" data-open="${p.id}" d="${elbow(cl.nx,L.y,L.w,endX,stemB,L.w+14,12)}" fill="${fill}" fill-opacity="${planned?1:.92}"/>`;
         let acc=0;
         outs.forEach((it,j)=>{
-          const r=Math.floor(j/per),k=j%per;const pk=p.id+":o"+j,po=off(pk);const cx=cl.x+20+k*(cw+12)+po.dx,cy=top+r*250+po.dy;
+          const r=Math.floor(j/per),k=j%per;const pk=p.id+":o"+j,po=posOf(pk);const cx=cl.x+20+k*(cw+12)+po.dx,cy=top+r*250+po.dy;
           html+=`<div class="card drag${it.planned?" planned":""}" data-pk="${pk}" style="position:absolute;left:${cx}px;top:${cy}px;width:${cw}px;--c:${col(c)}">${it.html}</div>`;
           const w=it.u*U;
           if(r===0)svg+=ribbon(cl.nx+acc+w/2,stemB-1,cx+cw/2,cy,w,Math.max(w,6),fill,planned?1:.8);
@@ -324,7 +324,7 @@ function draw(){
 }
 function openTheme(id,scroll){openId=id;peekId=null;const cl=draw();if(scroll!==false&&cl)flow.scrollTo({left:Math.max(0,cl.x-140)});history.replaceState(null,"","#"+id)}
 let drag=null,dragMoved=false;
-stage.addEventListener("pointerdown",e=>{const c=e.target.closest(".card.drag");if(!c||e.button!==0||e.target.closest("button,a,img,video"))return;const o=off(c.dataset.pk);drag={c,k:c.dataset.pk,x:e.clientX,y:e.clientY,dx:o.dx,dy:o.dy,abs:c.style.position==="absolute",l:parseFloat(c.style.left)||0,t:parseFloat(c.style.top)||0};dragMoved=false;c.setPointerCapture(e.pointerId)});
+stage.addEventListener("pointerdown",e=>{const c=e.target.closest(".card.drag");if(!c||e.button!==0||e.target.closest("button,a,img,video"))return;const o=posOf(c.dataset.pk);drag={c,k:c.dataset.pk,x:e.clientX,y:e.clientY,dx:o.dx,dy:o.dy,abs:c.style.position==="absolute",l:parseFloat(c.style.left)||0,t:parseFloat(c.style.top)||0};dragMoved=false;c.setPointerCapture(e.pointerId)});
 stage.addEventListener("pointermove",e=>{if(!drag)return;const mx=e.clientX-drag.x,my=e.clientY-drag.y;if(!dragMoved&&Math.hypot(mx,my)<5)return;dragMoved=true;drag.c.classList.add("dragging");drag.c.style.transform=`translate(${drag.abs?mx:drag.dx+mx}px,${drag.abs?my:drag.dy+my}px)`;drag.mx=mx;drag.my=my});
 stage.addEventListener("pointerup",()=>{if(!drag)return;const d=drag;drag=null;if(dragMoved){POS[d.k]={dx:d.dx+d.mx,dy:d.dy+d.my};savePos();draw()}});
 stage.addEventListener("click",e=>{if(dragMoved){e.stopPropagation();e.preventDefault();dragMoved=false}},true);
