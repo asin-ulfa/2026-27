@@ -410,7 +410,7 @@ function setLang(l){LANG=l;try{localStorage.setItem("aisn_lang",l)}catch(e){}doc
   const lg=l==="en"?"en":"sl";document.getElementById("logoB").src=`brand/ul_fa_logo_hor_black_${lg}_v1_2026-11-14.png`;document.getElementById("logoW").src=`brand/ul_fa_logo_hor_white_${lg}_v1_2026-11-14.png`;
   document.getElementById("cname").textContent=tr("· Action and Strategic Planning","· Akcijsko in strateško načrtovanje");
   const cu=tr("https://www.fa.uni-lj.si/en/predmet/action-and-strategic-planning/","https://www.fa.uni-lj.si/predmet/akcijsko-in-stratesko-nacrtovanje/");
-  document.getElementById("facts").innerHTML=`${tr("Course holder","Nosilec predmeta")}: <b>doc. dr. Tomaž Berčič</b> · ${tr("Year 5, winter semester, elective","5. letnik, zimski semester, izbirni predmet")} · <a href="${cu}" target="_blank" rel="noopener">${tr("Course page","Spletna stran predmeta")} ↗</a>`;
+  document.getElementById("facts").innerHTML=`${tr("Course holder","Nosilec predmeta")}: <a href="${tr("https://www.fa.uni-lj.si/en/imenik/auto-draft-8/","https://www.fa.uni-lj.si/imenik/tomaz-bercic/")}" target="_blank" rel="noopener"><b>doc. dr. Tomaž Berčič</b></a> · ${tr("Year 5, winter semester, elective","5. letnik, zimski semester, izbirni predmet")} · <a href="${cu}" target="_blank" rel="noopener">${tr("Course page","Spletna stran predmeta")} ↗</a>`;
   document.querySelectorAll(".lang button[data-lang]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.lang===l));
   draw();}
 document.querySelectorAll(".lang button[data-lang]").forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
